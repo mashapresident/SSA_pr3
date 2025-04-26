@@ -3,28 +3,106 @@
 ## Завдання 1
 
 ### Текст завдання
+Запустіть Docker-контейнер і поекспериментуйте з максимальним лімітом ресурсів відкритих файлів. Для цього виконайте команди у вказаному порядку:
+
+>$ ulimit -n
+>
+>$ ulimit -aS | grep "open files"
+>
+>$ ulimit -aH | grep "open files"
+>
+>$ ulimit -n 3000
+>
+>$ ulimit -aS | grep "open files"
+>
+>$ ulimit -aH | grep "open files"
+>
+>$ ulimit -n 3001
+>
+>$ ulimit -n 2000
+>
+>$ ulimit -n
+>
+>$ ulimit -aS | grep "open files"
+>
+>$ ulimit -aH | grep "open files"
+>
+>$ ulimit -n 3000
+
+Як наступне вправу, повторіть перераховані команди з root-правами.
 
 ____
 ### *Реалізація v1*
-```
+[Правильне встановлення докеру](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
 
-```
+[Налаштування докеру](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04)
 
-
->$ gcc task1_time.c -o t1
-
->$ ./t1
+>$ docker run -it --name limit-test --ulimit nofile=3000:3000 ubuntu bash
+>
+>Unable to find image 'ubuntu:latest' locally
+>
+>latest: Pulling from library/ubuntu
+>
+>2726e237d1a3: Pull complete
+>
+>Digest: sha256:1e622c5f073b4f6bfad6632f2616c7f59ef256e96fe78bf6a595d1dc4376ac02
+>
+>Status: Downloaded newer image for ubuntu:latest
+>
+>\# ulimit -n
+>
+>3000
+>
+>\# ulimit -aS | grep "open files"
+>
+>open files                          (-n) 3000
+>
+>\# ulimit -aH | grep "open files"
+>
+>open files                          (-n) 3000
+>
+>\# ulimit -n 3000
+>
+>\# ulimit -aS | grep "open files"
+>
+>open files                          (-n) 3000
+>
+>\# ulimit -aH | grep "open files"
+>
+>open files                          (-n) 3000
+>
+>\# ulimit -n 3001
+>
+>bash: ulimit: open files: cannot modify limit: Operation not permitted
+>
+>\# ulimit -n 2000
+>
+>\# ulimit -n
+>
+>2000
+>
+>\# ulimit -aS | grep "open files"
+>
+>open files                          (-n) 2000
+>
+>\# ulimit -aH | grep "open files"
+>
+>open files                          (-n) 2000
+>
+>\# ulimit -n 3000
+>
+>bash: ulimit: open files: cannot modify limit: Operation not permitted
+>
+>\# exit
 ____
 ### *Пояснення*
-При виконанні екзешнику можемо очікувати задовго(час залежить від системи). 
-Для 32-бітної системи time_t має максимум 2147483647 (2^31 - 1 секунд).І при виконанні великого числа ітерацій за секунду, програма може виконатись достатньо швидко. 
-Для 64-бітної системи time_t може зберігати значення до 2^63 1 секунд (≈292 мільярди років). Тому можна піти іншим шляхом - взяти максимальні значення лонгів.
-
+Ми перевіряємо та змінюємо ліміти відкритих файлів для процесів у контейнері за допомогою команди ulimit. Це дозволяє визначити, скільки файлів або сокетів може бути відкрито одночасно.Ми змінюємо значення цих лімітів, щоб зрозуміти, як вони впливають на стабільність системи та роботу процесів.
 
 ## Завдання 2
 
 ### Текст завдання
 
+У Docker-контейнері встановіть утиліту perf(1). Поекспериментуйте з досягненням процесом встановленого ліміту.
 ____
 ### *Реалізація pt1*
 ```
