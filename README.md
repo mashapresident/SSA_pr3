@@ -33,70 +33,24 @@
 
 ____
 ### *Реалізація*
-[Правильне встановлення докеру](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
 
-[Налаштування докеру](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04)
+```
+sudo apt update
+sudo apt install -y docker.io
+sudo systemctl enable docker
+sudo systemctl start docker
+sudo usermod -aG docker masha
+```
 
->$ docker run -it --name limit-test --ulimit nofile=3000:3000 ubuntu bash
->
->Unable to find image 'ubuntu:latest' locally
->
->latest: Pulling from library/ubuntu
->
->2726e237d1a3: Pull complete
->
->Digest: sha256:1e622c5f073b4f6bfad6632f2616c7f59ef256e96fe78bf6a595d1dc4376ac02
->
->Status: Downloaded newer image for ubuntu:latest
->
->\# ulimit -n
->
->3000
->
->\# ulimit -aS | grep "open files"
->
->open files                          (-n) 3000
->
->\# ulimit -aH | grep "open files"
->
->open files                          (-n) 3000
->
->\# ulimit -n 3000
->
->\# ulimit -aS | grep "open files"
->
->open files                          (-n) 3000
->
->\# ulimit -aH | grep "open files"
->
->open files                          (-n) 3000
->
->\# ulimit -n 3001
->
->bash: ulimit: open files: cannot modify limit: Operation not permitted
->
->\# ulimit -n 2000
->
->\# ulimit -n
->
->2000
->
->\# ulimit -aS | grep "open files"
->
->open files                          (-n) 2000
->
->\# ulimit -aH | grep "open files"
->
->open files                          (-n) 2000
->
->\# ulimit -n 3000
->
->bash: ulimit: open files: cannot modify limit: Operation not permitted
->
->\# exit
+![non_privileged mode](jpeg/non_priv.jpeg)
+
+Додамо параметр *--privileged* при запуску контейнера
+
+![privileged mode](jpeg/privileged.jpeg)
+
 ____
 ### *Пояснення*
-Ми перевіряємо та змінюємо ліміти відкритих файлів для процесів у контейнері за допомогою команди ulimit. Це дозволяє визначити, скільки файлів або сокетів може бути відкрито одночасно.Ми змінюємо значення цих лімітів, щоб зрозуміти, як вони впливають на стабільність системи та роботу процесів.
+--privileged дало контейнеру більше привілеїв, як, наприклад, змінювати системні налаштування, включаючи ulimit. Тобто, ми можемо у реальному часі змінювати налаштування контейнеру.
 
 ## Завдання 2
 
@@ -105,11 +59,22 @@ ____
 У Docker-контейнері встановіть утиліту perf(1). Поекспериментуйте з досягненням процесом встановленого ліміту.
 ____
 ### *Реалізація*
+для встановлення необхідних пакетів, маємо дізнатись версію ядра операційної системи
+```
+uname -r
+apt update 
+apt install linux-tools-$(uname -r)
+```
+![perf_record](jpeg/perf_record.jpeg)
 
+*perf record* починає запис виконання подій для подальшого аналізу. *-e syscalls:sys_enter_openat* вказує, що потрібно відстежувати системний виклик openat, який використовується процесами для відкриття файлів. *-a* означає, що запис буде вестися для всіх процесів в системі (не лише для одного конкретного). *sleep 120* — просто дає можливість системі працювати протягом 120 секунд, щоб зібрати дані про виклики openat.
+для
 
+![perf_report](jpeg/perf_report.jpeg)
+
+*perf report* допоможе зрозуміти, які процеси активно відкривають файли і як використовується файловий ввід-вивід.
 ____
-### *Пояснення*
-____
+
 
 ## Завдання 3
 
